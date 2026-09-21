@@ -529,3 +529,33 @@ a {
 .about-body code {
   font-size: 0.9em;
 }
+
+/* Words of Jesus — dedicated red; Appearance text color does not override */
+:root {
+  --woj-color: #c62828;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --woj-color: #ef5350;
+  }
+}
+
+.words-of-jesus {
+  color: var(--woj-color, #c62828);
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font: inherit;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-row input {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--accent);
+}

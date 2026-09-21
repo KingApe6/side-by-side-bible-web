@@ -9,6 +9,7 @@ import {
   saveAppearance,
   saveColumns,
   saveLocation,
+  saveShowRedLetter,
   type AppPreferences,
 } from '../lib/storage';
 import { loadChapterForColumns } from '../lib/bibleLoader';
@@ -20,6 +21,14 @@ import {
   normalizeHex,
   colorInputValue,
 } from '../lib/appearance';
+import {
+  loadWojBook,
+  renderApproxWoj,
+  renderKjvWithWoj,
+  verseHasJesus,
+  verseKey,
+  type WojBookIndex,
+} from '../lib/woj';
 
 type Screen = 'picker' | 'reader' | 'book' | 'appearance' | 'about' | 'change-translations';
 
@@ -30,6 +39,8 @@ export class App {
   private loading = false;
   private error: string | null = null;
   private aligned: ReturnType<typeof alignVerses> = [];
+  /** CrossWire-derived WOJ segments for the current book (lazy). */
+  private wojIndex: WojBookIndex | null = null;
   /** Draft selections while on picker / change-translations */
   private draftCount: 2 | 3 | 4 = 2;
   private draftIds: string[] = ['kjv', 'web'];
@@ -72,11 +83,15 @@ export class App {
         this.prefs.chapter = 1;
         saveLocation(this.prefs.bookNumber, this.prefs.chapter);
       }
-      const maps = await loadChapterForColumns(
-        this.prefs.columnIds,
-        this.prefs.bookNumber,
-        this.prefs.chapter,
-      );
+      const [maps, woj] = await Promise.all([
+        loadChapterForColumns(
+          this.prefs.columnIds,
+          this.prefs.bookNumber,
+          this.prefs.chapter,
+        ),
+        loadWojBook(this.prefs.bookNumber),
+      ]);
+      this.wojIndex = woj;
       this.aligned = alignVerses(maps);
     } catch (e) {
       this.error = e instanceof Error ? e.message : 'Could not load chapter.';
@@ -314,25 +329,39 @@ export class App {
                 : this.aligned.length === 0
                   ? `<p class="status">No verses found for this chapter.</p>`
                   : this.aligned
-                      .map(
-                        (row) => `
-              <div class="verse-row">
-                <span class="verse-num">${row.verse}</span>
-                ${row.texts
-                  .map(
-                    (t) => `
-                  <div class="verse-cell">${t == null ? '<span class="missing">—</span>' : escapeHtml(t)}</div>
-                `,
-                  )
-                  .join('')}
-              </div>
-            `,
-                      )
+                      .map((row) => this.renderVerseRow(row))
                       .join('')
           }
         </div>
       </div>
     `;
+  }
+
+  private renderVerseRow(row: { verse: number; texts: (string | null)[] }): string {
+    const showRed = this.prefs.showRedLetter;
+    const chapter = this.prefs.chapter;
+    const hasJesus = verseHasJesus(this.wojIndex, chapter, row.verse);
+    const segs = this.wojIndex?.[verseKey(chapter, row.verse)];
+    const cells = row.texts
+      .map((t, colIdx) => {
+        if (t == null) return `<div class="verse-cell"><span class="missing">—</span></div>`;
+        const id = this.prefs.columnIds[colIdx];
+        let html: string;
+        if (id === 'kjv') {
+          html = renderKjvWithWoj(t, segs, showRed);
+        } else {
+          // WEB / ASV (and any future PD column): approximate whole-verse tint
+          html = renderApproxWoj(t, hasJesus, showRed);
+        }
+        return `<div class="verse-cell">${html}</div>`;
+      })
+      .join('');
+    return `
+              <div class="verse-row">
+                <span class="verse-num">${row.verse}</span>
+                ${cells}
+              </div>
+            `;
   }
 
   private bindReader(): void {
@@ -478,9 +507,24 @@ export class App {
             </label>
           </div>
         </section>
+        <section class="appear-block">
+          <h2>Words of Jesus</h2>
+          <label class="toggle-row">
+            <input type="checkbox" id="toggle-red-letter" ${this.prefs.showRedLetter ? 'checked' : ''} />
+            <span>Show Jesus’ words in red</span>
+          </label>
+          <p class="muted tip" style="margin:0.5rem 0 0">
+            KJV uses precise red-letter spans from CrossWire OSIS markup.
+            WEB and ASV tint the whole verse when that KJV verse has any words of Jesus (approximate).
+          </p>
+        </section>
         <div class="preview-card">
           <p class="preview-label">Preview</p>
-          <p class="preview-sample">In the beginning God created the heaven and the earth.</p>
+          <p class="preview-sample">
+            And he saith unto them,
+            <span class="words-of-jesus">Why are ye fearful, O ye of little faith?</span>
+            Then he arose, and rebuked the winds and the sea.
+          </p>
         </div>
         <p class="muted tip">Choices are saved in this browser (localStorage).</p>
       </div>
@@ -519,6 +563,12 @@ export class App {
     this.root.querySelector('[data-action="back-reader"]')?.addEventListener('click', () => {
       this.setScreen('reader');
       void this.loadAndRender();
+    });
+
+    this.root.querySelector<HTMLInputElement>('#toggle-red-letter')?.addEventListener('change', (ev) => {
+      const on = (ev.target as HTMLInputElement).checked;
+      this.prefs.showRedLetter = on;
+      saveShowRedLetter(on);
     });
 
     this.root.querySelectorAll<HTMLButtonElement>('[data-bg]').forEach((btn) => {
@@ -607,6 +657,26 @@ export class App {
             <a href="https://getbible.net" target="_blank" rel="noopener noreferrer">getBible</a>
             v2 (<code>api.getbible.net/v2</code>). Verse wording is never invented by this app.
           </p>
+          <h2>Words of Jesus (red letter)</h2>
+          <p>
+            Red-letter markup for the <strong>KJV</strong> column comes from the
+            <a href="https://crosswire.org/" target="_blank" rel="noopener noreferrer">CrossWire</a>
+            KJV OSIS module (<code>&lt;q who="Jesus"&gt;</code> spans), shipped as a compact
+            per-book index under <code>data/woj/</code>. CrossWire grants a general public
+            license to use the KJV2003/OSIS text for any purpose; this app attributes that
+            module here and does not redistribute the full OSIS file.
+          </p>
+          <p>
+            <strong>KJV:</strong> Jesus’ spoken segments are highlighted precisely when the
+            getBible verse text aligns with the OSIS plain text (best-effort otherwise;
+            if alignment fails but the verse has Jesus markup, the whole KJV verse is shown in red).
+          </p>
+          <p>
+            <strong>WEB &amp; ASV:</strong> getBible modules lack WOJ tags. When the matching
+            KJV verse contains any words of Jesus, the entire WEB/ASV verse is tinted red
+            as an <em>approximate</em> cue — not a claim that every word in that verse is speech of Jesus.
+          </p>
+          <p class="muted">Toggle under Appearance → “Show Jesus’ words in red” (default on).</p>
           <h2>Licensed (not bundled)</h2>
           <ul>
             ${licensed

@@ -45,6 +45,17 @@ export function colorInputValue(hex: string, fallback: string): string {
   return fallback.toUpperCase();
 }
 
+function luminance(hex: string): number | null {
+  const m = /^#([0-9A-Fa-f]{6})$/.exec(hex);
+  if (!m) return null;
+  const n = parseInt(m[1], 16);
+  const r = ((n >> 16) & 255) / 255;
+  const g = ((n >> 8) & 255) / 255;
+  const b = (n & 255) / 255;
+  const lin = (c: number) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+}
+
 export function applyAppearance(backgroundHex: string, textHex: string): void {
   const root = document.documentElement;
   if (backgroundHex) {
@@ -56,5 +67,14 @@ export function applyAppearance(backgroundHex: string, textHex: string): void {
     root.style.setProperty('--reader-fg', textHex);
   } else {
     root.style.removeProperty('--reader-fg');
+  }
+  // Words-of-Jesus red: brighter on dark reader backgrounds
+  const lum = backgroundHex ? luminance(backgroundHex) : null;
+  if (lum != null && lum < 0.35) {
+    root.style.setProperty('--woj-color', '#ef5350');
+  } else if (lum != null) {
+    root.style.setProperty('--woj-color', '#c62828');
+  } else {
+    root.style.removeProperty('--woj-color');
   }
 }

@@ -8,6 +8,7 @@ const KEYS = {
   bgHex: 'sbsb.bgHex',
   textHex: 'sbsb.textHex',
   setupDone: 'sbsb.setupDone',
+  showRedLetter: 'sbsb.showRedLetter',
 } as const;
 
 export type AppPreferences = {
@@ -18,6 +19,8 @@ export type AppPreferences = {
   backgroundHex: string;
   textHex: string;
   setupDone: boolean;
+  /** Show Jesus' words in red (default ON). */
+  showRedLetter: boolean;
 };
 
 function readJson<T>(key: string, fallback: T): T {
@@ -55,6 +58,7 @@ export function loadPreferences(): AppPreferences {
   const columnIds = sanitizeColumns(readJson<string[]>(KEYS.columns, [...DEFAULT_COLUMN_IDS]), columnCount);
   const bookNumber = Math.min(66, Math.max(1, Number(localStorage.getItem(KEYS.book) ?? '1') || 1));
   const chapter = Math.max(1, Number(localStorage.getItem(KEYS.chapter) ?? '1') || 1);
+  const redRaw = localStorage.getItem(KEYS.showRedLetter);
   return {
     columnIds,
     columnCount,
@@ -63,6 +67,8 @@ export function loadPreferences(): AppPreferences {
     backgroundHex: localStorage.getItem(KEYS.bgHex) ?? '',
     textHex: localStorage.getItem(KEYS.textHex) ?? '',
     setupDone: localStorage.getItem(KEYS.setupDone) === '1',
+    // Default ON when unset
+    showRedLetter: redRaw == null ? true : redRaw === '1',
   };
 }
 
@@ -80,4 +86,8 @@ export function saveLocation(bookNumber: number, chapter: number): void {
 export function saveAppearance(backgroundHex: string, textHex: string): void {
   localStorage.setItem(KEYS.bgHex, backgroundHex);
   localStorage.setItem(KEYS.textHex, textHex);
+}
+
+export function saveShowRedLetter(show: boolean): void {
+  localStorage.setItem(KEYS.showRedLetter, show ? '1' : '0');
 }

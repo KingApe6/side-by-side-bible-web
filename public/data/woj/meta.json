@@ -1,0 +1,56 @@
+{
+  "source": "CrossWire KJV OSIS (kjv2.8 / 2015-12-20)",
+  "sourceUrl": "https://crosswire.org/~dmsmith/kjv2011/kjv2.8/kjv2_8-osis-201512200842.zip",
+  "license": "CrossWire general public license for KJV2003/OSIS text \u2014 free use for any purpose with attribution.",
+  "format": "Per-book map of \"chapter:verse\" \u2192 segments [{t, j?}]. j:true = words of Jesus from <q who=\"Jesus\">.",
+  "books": [
+    {
+      "n": 40,
+      "osis": "Matt",
+      "verses": 644,
+      "bytes": 95913
+    },
+    {
+      "n": 41,
+      "osis": "Mark",
+      "verses": 286,
+      "bytes": 43314
+    },
+    {
+      "n": 42,
+      "osis": "Luke",
+      "verses": 587,
+      "bytes": 88707
+    },
+    {
+      "n": 43,
+      "osis": "John",
+      "verses": 419,
+      "bytes": 60630
+    },
+    {
+      "n": 44,
+      "osis": "Acts",
+      "verses": 27,
+      "bytes": 4641
+    },
+    {
+      "n": 46,
+      "osis": "1Cor",
+      "verses": 2,
+      "bytes": 379
+    },
+    {
+      "n": 47,
+      "osis": "2Cor",
+      "verses": 1,
+      "bytes": 246
+    },
+    {
+      "n": 66,
+      "osis": "Rev",
+      "verses": 62,
+      "bytes": 10709
+    }
+  ]
+}

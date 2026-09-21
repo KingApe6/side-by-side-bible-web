@@ -14,7 +14,8 @@ Companion native app: [side-by-side-bible](https://github.com/KingApe6/side-by-s
 - **Book & chapter** — full Protestant 66-book canon, chapter grid, previous/next chapter.
 - **Change translations** later from the reader toolbar.
 - **Appearance** — background/text presets and custom `#RRGGBB` hex (saved in `localStorage`).
-- **About** — attribution for public-domain modules and licensed stubs.
+- **Red letter** — optional “Show Jesus’ words in red” (default on). KJV uses CrossWire OSIS `<q who="Jesus">` spans; WEB/ASV tint whole verses approximately when KJV has WOJ.
+- **About** — attribution for public-domain modules, CrossWire WOJ markup, and licensed stubs.
 
 ## Translations
 
@@ -92,8 +93,11 @@ src/
     verseAlign.ts       # union of verse numbers
     storage.ts          # localStorage prefs
     appearance.ts       # presets + hex
+    woj.ts              # WOJ lazy load + KJV align / WEB·ASV approx
   ui/
     app.ts              # screens: picker, reader, book, appearance, about
+  public/data/woj/      # per-book WOJ segment JSON (from CrossWire OSIS)
+  scripts/build-woj.py  # rebuild WOJ index from kjv.xml / zip
 docs/                   # GitHub Pages site (build output)
 README.md
 DEPLOY.md
