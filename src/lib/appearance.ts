@@ -38,6 +38,13 @@ export function normalizeHex(input: string): string | null {
   return withHash.toUpperCase();
 }
 
+
+/** Native <input type="color"> requires #RRGGBB; use fallback when system/empty. */
+export function colorInputValue(hex: string, fallback: string): string {
+  if (HEX_RE.test(hex)) return hex.toUpperCase();
+  return fallback.toUpperCase();
+}
+
 export function applyAppearance(backgroundHex: string, textHex: string): void {
   const root = document.documentElement;
   if (backgroundHex) {

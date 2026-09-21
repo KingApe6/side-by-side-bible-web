@@ -18,6 +18,7 @@ import {
   TEXT_PRESETS,
   applyAppearance,
   normalizeHex,
+  colorInputValue,
 } from '../lib/appearance';
 
 type Screen = 'picker' | 'reader' | 'book' | 'appearance' | 'about' | 'change-translations';
@@ -423,6 +424,8 @@ export class App {
   private renderAppearance(): string {
     const bg = this.prefs.backgroundHex;
     const fg = this.prefs.textHex;
+    const bgPicker = colorInputValue(bg, '#FFFFFF');
+    const fgPicker = colorInputValue(fg, '#000000');
     return `
       <div class="screen appearance-screen">
         <header class="screen-header">
@@ -441,9 +444,16 @@ export class App {
             `,
             ).join('')}
           </div>
-          <label class="hex-field">Custom hex
-            <input type="text" id="bg-hex" value="${escapeAttr(bg)}" placeholder="#RRGGBB or blank for system" maxlength="7" />
-          </label>
+          <div class="color-row">
+            <label class="color-pick">
+              <span>Pick a color</span>
+              <input type="color" id="bg-color" value="${escapeAttr(bgPicker)}" title="Background color" />
+            </label>
+            <label class="hex-field">
+              <span>Hex <span class="muted">(optional)</span></span>
+              <input type="text" id="bg-hex" value="${escapeAttr(bg)}" placeholder="#RRGGBB or blank for system" maxlength="7" />
+            </label>
+          </div>
         </section>
         <section class="appear-block">
           <h2>Text</h2>
@@ -457,9 +467,16 @@ export class App {
             `,
             ).join('')}
           </div>
-          <label class="hex-field">Custom hex
-            <input type="text" id="fg-hex" value="${escapeAttr(fg)}" placeholder="#RRGGBB or blank for system" maxlength="7" />
-          </label>
+          <div class="color-row">
+            <label class="color-pick">
+              <span>Pick a color</span>
+              <input type="color" id="fg-color" value="${escapeAttr(fgPicker)}" title="Text color" />
+            </label>
+            <label class="hex-field">
+              <span>Hex <span class="muted">(optional)</span></span>
+              <input type="text" id="fg-hex" value="${escapeAttr(fg)}" placeholder="#RRGGBB or blank for system" maxlength="7" />
+            </label>
+          </div>
         </section>
         <div class="preview-card">
           <p class="preview-label">Preview</p>
@@ -476,6 +493,29 @@ export class App {
       applyAppearance(this.prefs.backgroundHex, this.prefs.textHex);
     };
 
+    /** Apply color without full re-render (keeps native color picker open while dragging). */
+    const applyLive = (which: 'bg' | 'fg', hex: string): void => {
+      if (which === 'bg') {
+        this.prefs.backgroundHex = hex;
+        const hexEl = this.root.querySelector<HTMLInputElement>('#bg-hex');
+        const colorEl = this.root.querySelector<HTMLInputElement>('#bg-color');
+        if (hexEl) hexEl.value = hex;
+        if (colorEl) colorEl.value = colorInputValue(hex, '#FFFFFF');
+      } else {
+        this.prefs.textHex = hex;
+        const hexEl = this.root.querySelector<HTMLInputElement>('#fg-hex');
+        const colorEl = this.root.querySelector<HTMLInputElement>('#fg-color');
+        if (hexEl) hexEl.value = hex;
+        if (colorEl) colorEl.value = colorInputValue(hex, '#000000');
+      }
+      persist();
+    };
+
+    const refresh = (): void => {
+      this.render();
+      this.bindAppearance();
+    };
+
     this.root.querySelector('[data-action="back-reader"]')?.addEventListener('click', () => {
       this.setScreen('reader');
       void this.loadAndRender();
@@ -485,21 +525,35 @@ export class App {
       btn.addEventListener('click', () => {
         this.prefs.backgroundHex = btn.dataset.bg ?? '';
         persist();
-        this.render();
-        this.bindAppearance();
+        refresh();
       });
     });
     this.root.querySelectorAll<HTMLButtonElement>('[data-fg]').forEach((btn) => {
       btn.addEventListener('click', () => {
         this.prefs.textHex = btn.dataset.fg ?? '';
         persist();
-        this.render();
-        this.bindAppearance();
+        refresh();
       });
     });
 
+    const bgColor = this.root.querySelector<HTMLInputElement>('#bg-color');
+    const fgColor = this.root.querySelector<HTMLInputElement>('#fg-color');
     const bgInput = this.root.querySelector<HTMLInputElement>('#bg-hex');
     const fgInput = this.root.querySelector<HTMLInputElement>('#fg-hex');
+
+    bgColor?.addEventListener('input', () => {
+      applyLive('bg', bgColor.value.toUpperCase());
+    });
+    bgColor?.addEventListener('change', () => {
+      refresh();
+    });
+    fgColor?.addEventListener('input', () => {
+      applyLive('fg', fgColor.value.toUpperCase());
+    });
+    fgColor?.addEventListener('change', () => {
+      refresh();
+    });
+
     bgInput?.addEventListener('change', () => {
       const n = normalizeHex(bgInput.value);
       if (n === null) {
@@ -508,8 +562,7 @@ export class App {
       }
       this.prefs.backgroundHex = n;
       persist();
-      this.render();
-      this.bindAppearance();
+      refresh();
     });
     fgInput?.addEventListener('change', () => {
       const n = normalizeHex(fgInput.value);
@@ -519,8 +572,7 @@ export class App {
       }
       this.prefs.textHex = n;
       persist();
-      this.render();
-      this.bindAppearance();
+      refresh();
     });
   }
 
