@@ -1,0 +1,81 @@
+/** Protestant 66-book canon with traditional chapter counts. */
+
+export interface CanonBook {
+  number: number;
+  name: string;
+  abbreviation: string;
+  chapterCount: number;
+}
+
+export const PROTESTANT_CANON: CanonBook[] = [
+  { number: 1, name: 'Genesis', abbreviation: 'Gen', chapterCount: 50 },
+  { number: 2, name: 'Exodus', abbreviation: 'Exod', chapterCount: 40 },
+  { number: 3, name: 'Leviticus', abbreviation: 'Lev', chapterCount: 27 },
+  { number: 4, name: 'Numbers', abbreviation: 'Num', chapterCount: 36 },
+  { number: 5, name: 'Deuteronomy', abbreviation: 'Deut', chapterCount: 34 },
+  { number: 6, name: 'Joshua', abbreviation: 'Josh', chapterCount: 24 },
+  { number: 7, name: 'Judges', abbreviation: 'Judg', chapterCount: 21 },
+  { number: 8, name: 'Ruth', abbreviation: 'Ruth', chapterCount: 4 },
+  { number: 9, name: '1 Samuel', abbreviation: '1Sam', chapterCount: 31 },
+  { number: 10, name: '2 Samuel', abbreviation: '2Sam', chapterCount: 24 },
+  { number: 11, name: '1 Kings', abbreviation: '1Kgs', chapterCount: 22 },
+  { number: 12, name: '2 Kings', abbreviation: '2Kgs', chapterCount: 25 },
+  { number: 13, name: '1 Chronicles', abbreviation: '1Chr', chapterCount: 29 },
+  { number: 14, name: '2 Chronicles', abbreviation: '2Chr', chapterCount: 36 },
+  { number: 15, name: 'Ezra', abbreviation: 'Ezra', chapterCount: 10 },
+  { number: 16, name: 'Nehemiah', abbreviation: 'Neh', chapterCount: 13 },
+  { number: 17, name: 'Esther', abbreviation: 'Esth', chapterCount: 10 },
+  { number: 18, name: 'Job', abbreviation: 'Job', chapterCount: 42 },
+  { number: 19, name: 'Psalms', abbreviation: 'Ps', chapterCount: 150 },
+  { number: 20, name: 'Proverbs', abbreviation: 'Prov', chapterCount: 31 },
+  { number: 21, name: 'Ecclesiastes', abbreviation: 'Eccl', chapterCount: 12 },
+  { number: 22, name: 'Song of Songs', abbreviation: 'Song', chapterCount: 8 },
+  { number: 23, name: 'Isaiah', abbreviation: 'Isa', chapterCount: 66 },
+  { number: 24, name: 'Jeremiah', abbreviation: 'Jer', chapterCount: 52 },
+  { number: 25, name: 'Lamentations', abbreviation: 'Lam', chapterCount: 5 },
+  { number: 26, name: 'Ezekiel', abbreviation: 'Ezek', chapterCount: 48 },
+  { number: 27, name: 'Daniel', abbreviation: 'Dan', chapterCount: 12 },
+  { number: 28, name: 'Hosea', abbreviation: 'Hos', chapterCount: 14 },
+  { number: 29, name: 'Joel', abbreviation: 'Joel', chapterCount: 3 },
+  { number: 30, name: 'Amos', abbreviation: 'Amos', chapterCount: 9 },
+  { number: 31, name: 'Obadiah', abbreviation: 'Obad', chapterCount: 1 },
+  { number: 32, name: 'Jonah', abbreviation: 'Jonah', chapterCount: 4 },
+  { number: 33, name: 'Micah', abbreviation: 'Mic', chapterCount: 7 },
+  { number: 34, name: 'Nahum', abbreviation: 'Nah', chapterCount: 3 },
+  { number: 35, name: 'Habakkuk', abbreviation: 'Hab', chapterCount: 3 },
+  { number: 36, name: 'Zephaniah', abbreviation: 'Zeph', chapterCount: 3 },
+  { number: 37, name: 'Haggai', abbreviation: 'Hag', chapterCount: 2 },
+  { number: 38, name: 'Zechariah', abbreviation: 'Zech', chapterCount: 14 },
+  { number: 39, name: 'Malachi', abbreviation: 'Mal', chapterCount: 4 },
+  { number: 40, name: 'Matthew', abbreviation: 'Matt', chapterCount: 28 },
+  { number: 41, name: 'Mark', abbreviation: 'Mark', chapterCount: 16 },
+  { number: 42, name: 'Luke', abbreviation: 'Luke', chapterCount: 24 },
+  { number: 43, name: 'John', abbreviation: 'John', chapterCount: 21 },
+  { number: 44, name: 'Acts', abbreviation: 'Acts', chapterCount: 28 },
+  { number: 45, name: 'Romans', abbreviation: 'Rom', chapterCount: 16 },
+  { number: 46, name: '1 Corinthians', abbreviation: '1Cor', chapterCount: 16 },
+  { number: 47, name: '2 Corinthians', abbreviation: '2Cor', chapterCount: 13 },
+  { number: 48, name: 'Galatians', abbreviation: 'Gal', chapterCount: 6 },
+  { number: 49, name: 'Ephesians', abbreviation: 'Eph', chapterCount: 6 },
+  { number: 50, name: 'Philippians', abbreviation: 'Phil', chapterCount: 4 },
+  { number: 51, name: 'Colossians', abbreviation: 'Col', chapterCount: 4 },
+  { number: 52, name: '1 Thessalonians', abbreviation: '1Thess', chapterCount: 5 },
+  { number: 53, name: '2 Thessalonians', abbreviation: '2Thess', chapterCount: 3 },
+  { number: 54, name: '1 Timothy', abbreviation: '1Tim', chapterCount: 6 },
+  { number: 55, name: '2 Timothy', abbreviation: '2Tim', chapterCount: 4 },
+  { number: 56, name: 'Titus', abbreviation: 'Titus', chapterCount: 3 },
+  { number: 57, name: 'Philemon', abbreviation: 'Phlm', chapterCount: 1 },
+  { number: 58, name: 'Hebrews', abbreviation: 'Heb', chapterCount: 13 },
+  { number: 59, name: 'James', abbreviation: 'Jas', chapterCount: 5 },
+  { number: 60, name: '1 Peter', abbreviation: '1Pet', chapterCount: 5 },
+  { number: 61, name: '2 Peter', abbreviation: '2Pet', chapterCount: 3 },
+  { number: 62, name: '1 John', abbreviation: '1John', chapterCount: 5 },
+  { number: 63, name: '2 John', abbreviation: '2John', chapterCount: 1 },
+  { number: 64, name: '3 John', abbreviation: '3John', chapterCount: 1 },
+  { number: 65, name: 'Jude', abbreviation: 'Jude', chapterCount: 1 },
+  { number: 66, name: 'Revelation', abbreviation: 'Rev', chapterCount: 22 },
+];
+
+export function getCanonBook(number: number): CanonBook | undefined {
+  return PROTESTANT_CANON.find((b) => b.number === number);
+}
